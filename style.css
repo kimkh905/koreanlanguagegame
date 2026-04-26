@@ -401,7 +401,7 @@ li span:last-child {
 
 .topic-strip {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 8px;
   margin-bottom: 16px;
 }
@@ -419,6 +419,12 @@ li span:last-child {
   background: var(--soft);
 }
 
+.topic-button.challenge {
+  border-color: #d95d6a;
+  color: #fff;
+  background: #d95d6a;
+}
+
 .topic-button.active {
   border-color: var(--accent);
   color: #fff;
@@ -429,4 +435,9 @@ li span:last-child {
   .topic-strip {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
+
+.topic-button.challenge.active {
+  border-color: #d95d6a;
+  background: #d95d6a;
 }

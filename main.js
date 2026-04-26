@@ -267,6 +267,9 @@ const topicSets = {
 };
 
 let activeTopic = 'basics';
+let isChallengeMode = false;
+let challengeQuestionCount = 0;
+const challengeWords = Object.values(topicSets).flatMap((set) => set.words.map((word) => ({ ...word, topic: set.label })));
 let currentIndex = 0;
 let score = 0;
 let streak = 0;
@@ -294,7 +297,14 @@ function getActiveSet() {
   return topicSets[activeTopic];
 }
 
+function getChallengeWord() {
+  return challengeWords[currentIndex];
+}
+
 function getActiveWords() {
+  if (isChallengeMode) {
+    return challengeWords;
+  }
   return getActiveSet().words;
 }
 
@@ -303,27 +313,70 @@ function normalizeAnswer(value) {
 }
 
 function getCurrentWord() {
+  if (isChallengeMode) {
+    return getChallengeWord();
+  }
   return getActiveWords()[currentIndex];
 }
 
+function getRandomChallengeIndex(previousIndex) {
+  if (challengeWords.length <= 1) {
+    return 0;
+  }
+
+  let nextIndex = previousIndex;
+
+  while (nextIndex === previousIndex) {
+    nextIndex = Math.floor(Math.random() * challengeWords.length);
+  }
+
+  return nextIndex;
+}
+
 function resetSet(message) {
+  isChallengeMode = false;
   currentIndex = 0;
   score = 0;
   streak = 0;
+  challengeQuestionCount = 0;
   setFeedback(message || `${getActiveSet().label} set selected.`);
   renderLesson();
   renderQuestion();
 }
 
+function startChallengeMode() {
+  isChallengeMode = true;
+  currentIndex = getRandomChallengeIndex(-1);
+  score = 0;
+  streak = 0;
+  challengeQuestionCount = 1;
+  setFeedback('Challenge mode started. Every vocabulary topic is active, and one mistake resets your score.');
+  renderLesson();
+  renderQuestion();
+}
+
 function renderTopics() {
-  topicStrip.innerHTML = Object.entries(topicSets)
+  const topicButtons = Object.entries(topicSets)
     .map(([key, set]) => (
-      `<button class="topic-button${key === activeTopic ? ' active' : ''}" type="button" data-topic="${key}">${set.label}</button>`
+      `<button class="topic-button${!isChallengeMode && key === activeTopic ? ' active' : ''}" type="button" data-topic="${key}">${set.label}</button>`
     ))
     .join('');
+
+  topicStrip.innerHTML = `<button class="topic-button challenge${isChallengeMode ? ' active' : ''}" type="button" data-challenge="true">Challenge</button>${topicButtons}`;
 }
 
 function renderLesson() {
+  if (isChallengeMode) {
+    topicEyebrow.textContent = 'Challenge mode';
+    lessonTitle.textContent = 'All Vocabulary';
+    lessonDescription.textContent = `Infinite test mode using ${challengeWords.length} words from every topic. Wrong answers reset the score to zero.`;
+    wordList.innerHTML = Object.values(topicSets)
+      .map((set) => `<li><span>${set.label}</span><span>${set.words.length} words</span></li>`)
+      .join('');
+    renderTopics();
+    return;
+  }
+
   const set = getActiveSet();
 
   topicEyebrow.textContent = `${set.label} set`;
@@ -340,9 +393,9 @@ function renderQuestion() {
   const isMeaningMode = mode === 'meaning';
 
   prompt.textContent = isMeaningMode ? word.english : word.romanization;
-  promptLabel.textContent = isMeaningMode ? 'Type this in Korean' : 'Type the Korean word for this romanization';
+  promptLabel.textContent = isChallengeMode ? `Challenge: ${word.topic}` : (isMeaningMode ? 'Type this in Korean' : 'Type the Korean word for this romanization');
   hint.textContent = isMeaningMode ? `Hint: ${word.romanization}` : `Meaning: ${word.english}`;
-  progress.textContent = `${currentIndex + 1} / ${getActiveWords().length}`;
+  progress.textContent = isChallengeMode ? `Question ${challengeQuestionCount}` : `${currentIndex + 1} / ${getActiveWords().length}`;
   streakDisplay.textContent = `${streak} streak`;
   scoreDisplay.textContent = score;
   answerInput.value = '';
@@ -355,6 +408,13 @@ function setFeedback(message, type) {
 }
 
 function nextQuestion() {
+  if (isChallengeMode) {
+    currentIndex = getRandomChallengeIndex(currentIndex);
+    challengeQuestionCount += 1;
+    renderQuestion();
+    return;
+  }
+
   currentIndex = (currentIndex + 1) % getActiveWords().length;
   renderQuestion();
 }
@@ -375,21 +435,28 @@ answerForm.addEventListener('submit', (event) => {
   }
 
   streak = 0;
-  score = Math.max(0, score - 2);
+  score = isChallengeMode ? 0 : Math.max(0, score - 2);
   streakDisplay.textContent = `${streak} streak`;
   scoreDisplay.textContent = score;
-  setFeedback(`Try again. Answer: ${word.korean} (${word.romanization}).`, 'wrong');
+  setFeedback(isChallengeMode ? `Challenge reset. Answer: ${word.korean} (${word.romanization}).` : `Try again. Answer: ${word.korean} (${word.romanization}).`, 'wrong');
   answerInput.select();
 });
 
 skipButton.addEventListener('click', () => {
   const word = getCurrentWord();
   streak = 0;
-  setFeedback(`Skipped. ${word.english}: ${word.korean} (${word.romanization}).`, 'wrong');
+  score = isChallengeMode ? 0 : score;
+  scoreDisplay.textContent = score;
+  setFeedback(isChallengeMode ? `Skipped. Challenge score reset. ${word.english}: ${word.korean} (${word.romanization}).` : `Skipped. ${word.english}: ${word.korean} (${word.romanization}).`, 'wrong');
   window.setTimeout(nextQuestion, 900);
 });
 
 restartButton.addEventListener('click', () => {
+  if (isChallengeMode) {
+    startChallengeMode();
+    return;
+  }
+
   resetSet(`${getActiveSet().label} set restarted.`);
 });
 
@@ -403,6 +470,13 @@ modeTabs.forEach((tab) => {
 });
 
 topicStrip.addEventListener('click', (event) => {
+  const challengeButton = event.target.closest('[data-challenge]');
+
+  if (challengeButton) {
+    startChallengeMode();
+    return;
+  }
+
   const button = event.target.closest('[data-topic]');
 
   if (!button) {
@@ -412,6 +486,5 @@ topicStrip.addEventListener('click', (event) => {
   activeTopic = button.dataset.topic;
   resetSet(`${getActiveSet().label} set selected. Review the words, then type the Korean answers.`);
 });
-
 renderLesson();
 renderQuestion();
