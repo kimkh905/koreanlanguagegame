@@ -902,7 +902,6 @@ const skipButton = document.querySelector('#skip-button');
 const streakDisplay = document.querySelector('#streak');
 const topicEyebrow = document.querySelector('#topic-eyebrow');
 const topicStrip = document.querySelector('#topic-strip');
-const wordList = document.querySelector('#word-list');
 
 function getActiveSet() {
   return topicSets[activeTopic];
@@ -981,9 +980,6 @@ function renderLesson() {
     topicEyebrow.textContent = 'Challenge mode';
     lessonTitle.textContent = 'All Vocabulary';
     lessonDescription.textContent = `Infinite test mode using ${challengeWords.length} words from every topic. Wrong answers reset the score to zero.`;
-    wordList.innerHTML = Object.values(topicSets)
-      .map((set) => `<li><span>${set.label}</span><span>${set.words.length} words</span></li>`)
-      .join('');
     renderTopics();
     return;
   }
@@ -992,10 +988,7 @@ function renderLesson() {
 
   topicEyebrow.textContent = `${set.label} set`;
   lessonTitle.textContent = set.label;
-  lessonDescription.textContent = set.description;
-  wordList.innerHTML = set.words
-    .map((word) => `<li><span>${word.korean}</span><span>${word.english}</span></li>`)
-    .join('');
+  lessonDescription.textContent = `${set.description} ${set.words.length} words.`;
   renderTopics();
 }
 

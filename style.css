@@ -325,30 +325,6 @@ input:focus {
   line-height: 1.6;
 }
 
-ul {
-  list-style: none;
-  margin: 20px 0 0;
-  padding: 0;
-}
-
-li {
-  display: flex;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 12px 0;
-  border-top: 1px solid var(--line);
-  font-weight: 800;
-}
-
-li span:first-child {
-  font-family: "Noto Sans KR", sans-serif;
-}
-
-li span:last-child {
-  color: var(--muted);
-  text-align: right;
-}
-
 @media (max-width: 840px) {
   .app-shell {
     grid-template-columns: 1fr;
