@@ -885,6 +885,7 @@ let currentIndex = 0;
 let score = 0;
 let streak = 0;
 let mode = 'meaning';
+let audioContext;
 
 const answerForm = document.querySelector('#answer-form');
 const answerInput = document.querySelector('#answer-input');
@@ -920,6 +921,65 @@ function getActiveWords() {
 
 function normalizeAnswer(value) {
   return value.trim().toLocaleLowerCase().replace(/\s+/g, '');
+}
+
+function getAudioContext() {
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+
+  if (!AudioContextClass) {
+    return null;
+  }
+
+  audioContext = audioContext || new AudioContextClass();
+
+  if (audioContext.state === 'suspended') {
+    audioContext.resume();
+  }
+
+  return audioContext;
+}
+
+function playToneSequence(notes) {
+  const context = getAudioContext();
+
+  if (!context) {
+    return;
+  }
+
+  const now = context.currentTime;
+
+  notes.forEach(({ frequency, start, duration }) => {
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    const startTime = now + start;
+    const endTime = startTime + duration;
+
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(frequency, startTime);
+    gain.gain.setValueAtTime(0.0001, startTime);
+    gain.gain.exponentialRampToValueAtTime(0.08, startTime + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, endTime);
+
+    oscillator.connect(gain);
+    gain.connect(context.destination);
+    oscillator.start(startTime);
+    oscillator.stop(endTime + 0.02);
+  });
+}
+
+function playCorrectSound() {
+  playToneSequence([
+    { frequency: 523.25, start: 0, duration: 0.11 },
+    { frequency: 659.25, start: 0.1, duration: 0.12 },
+    { frequency: 783.99, start: 0.21, duration: 0.16 }
+  ]);
+}
+
+function playWrongSound() {
+  playToneSequence([
+    { frequency: 196, start: 0, duration: 0.14 },
+    { frequency: 146.83, start: 0.13, duration: 0.18 }
+  ]);
 }
 
 function getCurrentWord() {
@@ -1031,6 +1091,7 @@ answerForm.addEventListener('submit', (event) => {
   const correctAnswer = normalizeAnswer(word.korean);
 
   if (userAnswer === correctAnswer) {
+    playCorrectSound();
     score += 10;
     streak += 1;
     setFeedback(`Correct: ${word.korean} means ${word.english}.`, 'correct');
@@ -1038,6 +1099,7 @@ answerForm.addEventListener('submit', (event) => {
     return;
   }
 
+  playWrongSound();
   streak = 0;
   score = isChallengeMode ? 0 : Math.max(0, score - 2);
   streakDisplay.textContent = `${streak} streak`;
@@ -1048,6 +1110,7 @@ answerForm.addEventListener('submit', (event) => {
 
 skipButton.addEventListener('click', () => {
   const word = getCurrentWord();
+  playWrongSound();
   streak = 0;
   score = isChallengeMode ? 0 : score;
   scoreDisplay.textContent = score;
