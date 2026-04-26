@@ -14,7 +14,7 @@
     <section class="quiz-panel" aria-labelledby="app-title">
       <div class="brand-row">
         <div>
-          <p class="eyebrow">Typing practice</p>
+          <p class="eyebrow" id="topic-eyebrow">Basics set</p>
           <h1 id="app-title">Korean Quiz</h1>
         </div>
         <div class="score-box" aria-live="polite">
@@ -23,6 +23,8 @@
         </div>
       </div>
 
+      <div class="topic-strip" id="topic-strip" aria-label="Choose quiz topic"></div>
+
       <div class="mode-tabs" role="tablist" aria-label="Quiz mode">
         <button class="mode-tab active" type="button" data-mode="meaning">English to Korean</button>
         <button class="mode-tab" type="button" data-mode="romanization">Romanization</button>
@@ -30,12 +32,12 @@
 
       <article class="question-card">
         <div class="card-topline">
-          <span id="progress">1 / 12</span>
+          <span id="progress">1 / 8</span>
           <span id="streak">0 streak</span>
         </div>
         <p class="prompt-label" id="prompt-label">Type this in Korean</p>
         <p class="prompt" id="prompt">Hello</p>
-        <p class="hint" id="hint">Hint: an-nyeong-ha-se-yo</p>
+        <p class="hint" id="hint">Hint: annyeonghaseyo</p>
       </article>
 
       <form class="answer-form" id="answer-form" autocomplete="off">
@@ -46,11 +48,11 @@
         </div>
       </form>
 
-      <div class="feedback" id="feedback" aria-live="polite">Start with common greetings and travel words.</div>
+      <div class="feedback" id="feedback" aria-live="polite">Choose a topic or start with basics.</div>
 
       <div class="actions">
         <button class="secondary" type="button" id="skip-button">Skip</button>
-        <button class="secondary" type="button" id="restart-button">Restart</button>
+        <button class="secondary" type="button" id="restart-button">Restart Set</button>
       </div>
     </section>
 
@@ -58,8 +60,8 @@
       <div class="hangul-art" aria-hidden="true">
         <span>한</span><span>글</span><span>배</span><span>움</span>
       </div>
-      <h2>Today&apos;s set</h2>
-      <p>Practice useful starter words. Type the Korean answer, press Enter, and build a streak.</p>
+      <h2 id="lesson-title">Basics</h2>
+      <p id="lesson-description">Common starter words for everyday Korean.</p>
       <ul id="word-list"></ul>
     </aside>
   </main>

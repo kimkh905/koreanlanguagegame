@@ -398,3 +398,35 @@ li span:last-child {
     width: 100%;
   }
 }
+
+.topic-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.topic-button {
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  background: #fff;
+  font-weight: 800;
+}
+
+.topic-button:hover {
+  background: var(--soft);
+}
+
+.topic-button.active {
+  border-color: var(--accent);
+  color: #fff;
+  background: var(--accent);
+}
+
+@media (max-width: 680px) {
+  .topic-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
