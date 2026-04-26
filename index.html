@@ -3,12 +3,67 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hello World</title>
-  <link href='/style.css' rel='stylesheet'>
+  <title>Korean Typing Quiz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
 </head>
 <body>
-  <h1>Hello, world!</h1>
-  <button onclick="console.log('hello');">Press me</button>
-  <script defer type="text/javascript" src="/main.js"></script>
+  <main class="app-shell">
+    <section class="quiz-panel" aria-labelledby="app-title">
+      <div class="brand-row">
+        <div>
+          <p class="eyebrow">Typing practice</p>
+          <h1 id="app-title">Korean Quiz</h1>
+        </div>
+        <div class="score-box" aria-live="polite">
+          <span id="score">0</span>
+          <small>score</small>
+        </div>
+      </div>
+
+      <div class="mode-tabs" role="tablist" aria-label="Quiz mode">
+        <button class="mode-tab active" type="button" data-mode="meaning">English to Korean</button>
+        <button class="mode-tab" type="button" data-mode="romanization">Romanization</button>
+      </div>
+
+      <article class="question-card">
+        <div class="card-topline">
+          <span id="progress">1 / 12</span>
+          <span id="streak">0 streak</span>
+        </div>
+        <p class="prompt-label" id="prompt-label">Type this in Korean</p>
+        <p class="prompt" id="prompt">Hello</p>
+        <p class="hint" id="hint">Hint: an-nyeong-ha-se-yo</p>
+      </article>
+
+      <form class="answer-form" id="answer-form" autocomplete="off">
+        <label for="answer-input">Your answer</label>
+        <div class="input-row">
+          <input id="answer-input" name="answer" type="text" inputmode="text" placeholder="Type Korean here" required autofocus>
+          <button type="submit">Check</button>
+        </div>
+      </form>
+
+      <div class="feedback" id="feedback" aria-live="polite">Start with common greetings and travel words.</div>
+
+      <div class="actions">
+        <button class="secondary" type="button" id="skip-button">Skip</button>
+        <button class="secondary" type="button" id="restart-button">Restart</button>
+      </div>
+    </section>
+
+    <aside class="lesson-panel" aria-label="Current lesson">
+      <div class="hangul-art" aria-hidden="true">
+        <span>한</span><span>글</span><span>배</span><span>움</span>
+      </div>
+      <h2>Today&apos;s set</h2>
+      <p>Practice useful starter words. Type the Korean answer, press Enter, and build a streak.</p>
+      <ul id="word-list"></ul>
+    </aside>
+  </main>
+
+  <script defer src="main.js"></script>
 </body>
 </html>
