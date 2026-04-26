@@ -932,18 +932,18 @@ function getAudioContext() {
 
   audioContext = audioContext || new AudioContextClass();
 
-  if (audioContext.state === 'suspended') {
-    audioContext.resume();
-  }
-
   return audioContext;
 }
 
-function playToneSequence(notes) {
+async function playToneSequence(notes) {
   const context = getAudioContext();
 
   if (!context) {
     return;
+  }
+
+  if (context.state === 'suspended') {
+    await context.resume();
   }
 
   const now = context.currentTime;
